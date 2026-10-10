@@ -192,6 +192,24 @@ TypeScript compilation was checked using:
 npx tsc --noEmit
 ```
 
+## AI Usage Log
+
+**Tool used:** ChatGPT (OpenAI)  
+**Period:** October 2026
+
+ChatGPT was used throughout the project as a learning and troubleshooting resource.
+
+| Purpose                     | AI assistance                                                                                                 |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Project planning            | Discussed the organisation of Express routes, middleware, and database functionality.                         |
+| Concept explanations        | Explained TypeScript configuration, Express routing, JWT authentication, bcrypt, SQL queries, and middleware. |
+| Debugging                   | Helped interpret error messages and investigate problems with TypeScript, MySQL, and API authentication.      |
+| Testing guidance            | Explained how to test API responses, validation, and authentication scenarios using Postman.                  |
+| Environment troubleshooting | Helped investigate MySQL version compatibility, Homebrew configuration, and database export issues.           |
+| Documentation assistance    | Helped draft and revise the README, Swagger/OpenAPI documentation, and reflection report.                     |
+
+AI suggestions were reviewed against the project's implementation and tested where applicable.
+
 ## Author
 
 Lene Johansen
