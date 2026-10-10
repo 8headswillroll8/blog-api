@@ -2,13 +2,13 @@ import "dotenv/config";
 import { Router } from "express";
 import bcrypt from "bcrypt";
 import { ResultSetHeader } from "mysql2";
-import { pool } from "../database";
+import { pool } from "../database.js";
 import {
   validateRegistration,
   validateLogin,
-} from "../middleware/auth-validation";
-import { User, UserResponse } from "../interfaces";
-import { generateToken } from "../utils/jwt";
+} from "../middleware/auth-validation.js";
+import { User, UserResponse } from "../interfaces.js";
+import { generateToken } from "../utils/jwt.js";
 
 const router = Router();
 

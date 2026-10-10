@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { pool } from "../database";
-import { Article } from "../interfaces";
+import { pool } from "../database.js";
+import { Article } from "../interfaces.js";
+import { authenticateToken } from "../middleware/auth-validation.js";
+import type { ResultSetHeader } from "mysql2";
 
 const router = Router();
-
-// https://learning.noroff.no/mod/book/view.php?id=28165&chapterid=109106#mod_book-chapter
 
 router.get("/", async (req, res) => {
   try {
@@ -17,6 +17,42 @@ router.get("/", async (req, res) => {
 
     res.status(500).json({
       error: "Failed to fetch articles",
+    });
+  }
+});
+
+router.post("/", authenticateToken, async (req, res) => {
+  try {
+    const { title, body, category } = req.body;
+
+    if (!title || !body || !category) {
+      return res.status(400).json({
+        error: "Title, body, and category are required",
+      });
+    }
+
+    const userId = req.user?.id;
+
+    if (userId === undefined) {
+      return res.status(401).json({
+        error: "Authentication required",
+      });
+    }
+
+    const [result] = await pool.execute<ResultSetHeader>(
+      "INSERT INTO articles (title, body, category, submitted_by) VALUES (?, ?, ?, ?)",
+      [title, body, category, userId],
+    );
+
+    res.status(201).json({
+      message: "Article created successfully",
+      id: result.insertId,
+    });
+  } catch (error) {
+    console.error("Article creation error:", error);
+
+    res.status(500).json({
+      error: "Failed to post article",
     });
   }
 });

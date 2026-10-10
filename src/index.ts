@@ -1,10 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import articleRoutes from "./routes/articles";
+import articleRoutes from "./routes/articles.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerJSdoc from "swagger-jsdoc";
-import authRoutes from "./routes/auth";
+import authRoutes from "./routes/auth.js";
 
 dotenv.config();
 
