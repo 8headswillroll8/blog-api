@@ -1,0 +1,194 @@
+openapi: 3.0.0
+
+info:
+  title: Blog API
+  version: 1.0.0
+  description: A REST API for user authentication and article management.
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: User registration and login
+  - name: Articles
+    description: Retrieve and create articles
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          minLength: 8
+          description: Must contain uppercase, lowercase, number and special character.
+          example: Password123!
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+
+    ArticleInput:
+      type: object
+      required:
+        - title
+        - body
+        - category
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: string
+          minLength: 1
+        category:
+          type: string
+          minLength: 1
+
+    Article:
+      allOf:
+        - $ref: "#/components/schemas/ArticleInput"
+        - type: object
+          properties:
+            id:
+              type: integer
+            submitted_by:
+              type: integer
+            created_at:
+              type: string
+              format: date-time
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User registered successfully
+        "400":
+          description: Invalid input or email already registered
+        "500":
+          description: Server error
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Log in and receive a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  user:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+        "400":
+          description: Invalid request data
+        "401":
+          description: Invalid email or password
+        "500":
+          description: Server error
+
+  /articles:
+    get:
+      tags:
+        - Articles
+      summary: Get all articles
+      responses:
+        "200":
+          description: List of articles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Article"
+        "500":
+          description: Server error
+
+    post:
+      tags:
+        - Articles
+      summary: Create a new article
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ArticleInput"
+      responses:
+        "201":
+          description: Article created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  id:
+                    type: integer
+        "400":
+          description: Invalid article data
+        "401":
+          description: Missing authentication token
+        "403":
+          description: Invalid or expired token
+        "500":
+          description: Server error

@@ -1,9 +1,13 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import articleRoutes from "./routes/articles.js";
 import swaggerUi from "swagger-ui-express";
-import swaggerJSdoc from "swagger-jsdoc";
+import YAML from "yaml";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+import articleRoutes from "./routes/articles.js";
 import authRoutes from "./routes/auth.js";
 
 dotenv.config();
@@ -11,20 +15,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Blog API",
-      version: "1.0.0",
-      description: "A simple API for managing users and articles",
-    },
-    servers: [{ url: `http://localhost:${PORT}` }],
-  },
-  apis: ["./src/routes/*.ts"],
-};
+const currentDir = dirname(fileURLToPath(import.meta.url));
 
-const swaggerSpec = swaggerJSdoc(swaggerOptions);
+const swaggerFile = readFileSync(join(currentDir, "swagger.yaml"), "utf8");
+
+const swaggerSpec = YAML.parse(swaggerFile);
 
 app.use(cors());
 app.use(express.json());
