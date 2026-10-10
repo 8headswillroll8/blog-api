@@ -32,7 +32,7 @@ router.post("/register", validateRegistration, async (req, res) => {
     const saltRounds = 10;
     const hashPassword = await bcrypt.hash(password, saltRounds);
 
-    const [result]: [ResultSetHeader, any] = await pool.execute(
+    const [result] = await pool.execute<ResultSetHeader>(
       "insert into users (email, password_hash) values (?, ?)",
       [email, hashPassword],
     );
@@ -76,7 +76,7 @@ router.post("/login", validateLogin, async (req, res) => {
 
     if (!validPassword) {
       return res.status(401).json({
-        error: "invalid password",
+        error: "invalid email or password",
       });
     }
 
