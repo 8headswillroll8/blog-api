@@ -58,7 +58,7 @@ router.post("/login", validateLogin, async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const [rows] = await pool.execute("select * from users when email = ?", [
+    const [rows] = await pool.execute("SELECT * FROM users WHERE email = ?", [
       email,
     ]);
 
