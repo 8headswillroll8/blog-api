@@ -25,10 +25,20 @@ router.post("/", authenticateToken, async (req, res) => {
   try {
     const { title, body, category } = req.body;
 
-    if (!title || !body || !category) {
-      return res.status(400).json({
-        error: "Title, body, and category are required",
-      });
+    if (typeof title !== "string" || title.trim().length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Title must be a non-empty string" });
+    }
+
+    if (typeof body !== "string" || body.trim().length === 0) {
+      return res.status(400).json({ error: "Body must be a non-empty string" });
+    }
+
+    if (typeof category !== "string" || category.trim().length === 0) {
+      return res
+        .status(400)
+        .json({ error: "Category must be a non-empty string" });
     }
 
     const userId = req.user?.id;
