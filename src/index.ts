@@ -1,61 +1,38 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { pool } from "./database";
+import articleRoutes from "./routes/articles";
+import swaggerUi from "swagger-ui-express";
+import swaggerJSdoc from "swagger-jsdoc";
+import authRoutes from "./routes/auth";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Blog API",
+      version: "1.0.0",
+      description: "A simple API for managing users and articles",
+    },
+    servers: [{ url: `http://localhost:${PORT}` }],
+  },
+  apis: ["./src/routes/*.ts"],
+};
+
+const swaggerSpec = swaggerJSdoc(swaggerOptions);
+
 app.use(cors());
 app.use(express.json());
 
-interface User {
-  id: number;
-  email: string;
-  password_hash: string;
-  created_at: Date;
-}
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-interface Article {
-  id: number;
-  title: string;
-  body: string;
-  category: string;
-  submitted_by: number;
-  created_at: Date;
-}
-
-app.get("/users", async (req, res) => {
-  try {
-    const [rows] = await pool.execute("SELECT * FROM users");
-    const users = rows as User[];
-
-    res.json(users);
-  } catch (error) {
-    console.error("Database query error:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch users",
-    });
-  }
-});
-
-app.get("/articles", async (req, res) => {
-  try {
-    const [rows] = await pool.execute("SELECT * FROM articles");
-    const articles = rows as Article[];
-
-    res.json(articles);
-  } catch (error) {
-    console.error("Database query error:", error);
-
-    res.status(500).json({
-      error: "Failed to fetch articles",
-    });
-  }
-});
+app.use("/auth", authRoutes);
+app.use("/articles", articleRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
